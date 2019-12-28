@@ -1,6 +1,7 @@
 package jdbc;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,6 +42,27 @@ public class Executor {
 			Statement select = connection.createStatement();
 			String query = "select employee_id, first_name, last_name from copy_employees";
 			ResultSet employees = select.executeQuery(query);
+			while(employees.next()){
+				Employee emp = new Employee();
+				emp.setEmployeeId(employees.getInt("employee_id"));
+				emp.setFirstName(employees.getString("first_name"));
+				emp.setLastName(employees.getString("last_name"));
+				returnValue.add(emp);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return returnValue;
+	}
+	
+	// With Prepared Statement
+	public List<Employee> select(int employeeId){
+		List<Employee> returnValue = new ArrayList<Employee>();
+		try {
+			String query = "select employee_id, first_name, last_name from copy_employees where employee_id = ?";
+			PreparedStatement select = connection.prepareStatement(query);
+			select.setInt(1, employeeId);
+			ResultSet employees = select.executeQuery();
 			while(employees.next()){
 				Employee emp = new Employee();
 				emp.setEmployeeId(employees.getInt("employee_id"));
